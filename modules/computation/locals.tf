@@ -21,6 +21,6 @@ locals {
   enable_fargate_on_batch = var.batch_type == "fargate"
   
   # Reference to the ECS execution role (either existing or created)
-  ecs_execution_role_name_actual = var.existing_ecs_execution_role_name != "" ? data.aws_iam_role.existing_ecs_execution_role[0].name : aws_iam_role.ecs_execution_role[0].name
-  ecs_execution_role_arn_actual = var.existing_ecs_execution_role_name != "" ? data.aws_iam_role.existing_ecs_execution_role[0].arn : aws_iam_role.ecs_execution_role[0].arn
+  ecs_execution_role_name_actual = var.existing_ecs_execution_role_name != "" ? var.existing_ecs_execution_role_name : aws_iam_role.ecs_execution_role[0].name
+  ecs_execution_role_arn_actual = var.existing_ecs_execution_role_name != "" ? "arn:${var.iam_partition}:iam::${var.shared_iam_account_id}:role/${var.existing_ecs_execution_role_name}" : aws_iam_role.ecs_execution_role[0].arn
 }

@@ -27,6 +27,6 @@ locals {
   database_ssl_mode = tonumber(split(".", var.db_engine_version)[0]) >= 15 ? "require" : "disable"
   
   # Reference to the batch S3 task role (either existing or created)
-  batch_s3_task_role_name_actual = var.existing_batch_s3_task_role_name != "" ? data.aws_iam_role.existing_batch_s3_task_role[0].name : aws_iam_role.batch_s3_task_role[0].name
-  batch_s3_task_role_arn_actual = var.existing_batch_s3_task_role_name != "" ? data.aws_iam_role.existing_batch_s3_task_role[0].arn : aws_iam_role.batch_s3_task_role[0].arn
+  batch_s3_task_role_name_actual = var.existing_batch_s3_task_role_name != "" ? var.existing_batch_s3_task_role_name : aws_iam_role.batch_s3_task_role[0].name
+  batch_s3_task_role_arn_actual = var.existing_batch_s3_task_role_name != "" ? "arn:${var.iam_partition}:iam::${var.shared_iam_account_id}:role/${var.existing_batch_s3_task_role_name}" : aws_iam_role.batch_s3_task_role[0].arn
 }

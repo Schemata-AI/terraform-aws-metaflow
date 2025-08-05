@@ -100,6 +100,7 @@ module "metaflow-computation" {
   launch_template_http_put_response_hop_limit = var.launch_template_http_put_response_hop_limit
 
   existing_ecs_execution_role_name = var.existing_ecs_execution_role_name
+  shared_iam_account_id = var.shared_iam_account_id
 
   standard_tags = var.tags
 }

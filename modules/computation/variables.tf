@@ -108,3 +108,9 @@ variable "existing_ecs_execution_role_name" {
   description = "Name of existing ECS execution role. If provided, role will not be created."
   default     = ""
 }
+
+variable "shared_iam_account_id" {
+  type        = string
+  description = "AWS account ID where IAM roles are hosted (separate from deployment account)"
+  default     = ""
+}

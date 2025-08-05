@@ -26,10 +26,8 @@ resource "aws_iam_role" "batch_s3_task_role" {
   tags = var.tags
 }
 
-data "aws_iam_role" "existing_batch_s3_task_role" {
-  count = var.existing_batch_s3_task_role_name != "" ? 1 : 0
-  name  = var.existing_batch_s3_task_role_name
-}
+# Note: We construct the ARN directly in locals.tf instead of using data source
+# because the role exists in a different AWS account (shared_iam_account_id)
 
 data "aws_iam_policy_document" "custom_s3_list_batch" {
   statement {

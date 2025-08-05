@@ -28,10 +28,8 @@ resource "aws_iam_role" "ecs_execution_role" {
   tags = var.standard_tags
 }
 
-data "aws_iam_role" "existing_ecs_execution_role" {
-  count = var.existing_ecs_execution_role_name != "" ? 1 : 0
-  name  = var.existing_ecs_execution_role_name
-}
+# Note: We construct the ARN directly in locals.tf instead of using data source
+# because the role exists in a different AWS account (shared_iam_account_id)
 
 data "aws_iam_policy_document" "ecs_task_execution_policy" {
   statement {
