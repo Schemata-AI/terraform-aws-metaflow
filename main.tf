@@ -99,6 +99,8 @@ module "metaflow-computation" {
   launch_template_http_tokens                 = var.launch_template_http_tokens
   launch_template_http_put_response_hop_limit = var.launch_template_http_put_response_hop_limit
 
+  existing_ecs_execution_role_name = var.existing_ecs_execution_role_name
+
   standard_tags = var.tags
 }
 

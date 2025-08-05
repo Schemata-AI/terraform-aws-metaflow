@@ -102,3 +102,9 @@ variable "launch_template_image_id" {
   nullable    = true
   default     = null
 }
+
+variable "existing_ecs_execution_role_name" {
+  type        = string
+  description = "Name of existing ECS execution role. If provided, role will not be created."
+  default     = ""
+}

@@ -19,12 +19,18 @@ data "aws_iam_policy_document" "ecs_execution_role_assume_role" {
 }
 
 resource "aws_iam_role" "ecs_execution_role" {
+  count = var.existing_ecs_execution_role_name == "" ? 1 : 0
   name = local.ecs_execution_role_name
   # Read more about ECS' `task_role` and `execution_role` here https://stackoverflow.com/a/49947471
   description        = "This role is passed to our AWS ECS' task definition as the `execution_role`. This allows things like the correct image to be pulled and logs to be stored."
   assume_role_policy = data.aws_iam_policy_document.ecs_execution_role_assume_role.json
 
   tags = var.standard_tags
+}
+
+data "aws_iam_role" "existing_ecs_execution_role" {
+  count = var.existing_ecs_execution_role_name != "" ? 1 : 0
+  name  = var.existing_ecs_execution_role_name
 }
 
 data "aws_iam_policy_document" "ecs_task_execution_policy" {
@@ -49,7 +55,8 @@ data "aws_iam_policy_document" "ecs_task_execution_policy" {
 }
 
 resource "aws_iam_role_policy" "grant_ecs_access" {
+  count  = var.existing_ecs_execution_role_name == "" ? 1 : 0
   name   = "ecs_access"
-  role   = aws_iam_role.ecs_execution_role.name
+  role   = local.ecs_execution_role_name_actual
   policy = data.aws_iam_policy_document.ecs_task_execution_policy.json
 }

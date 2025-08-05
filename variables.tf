@@ -199,3 +199,21 @@ variable "enable_key_rotation" {
   description = "Enable key rotation for KMS keys"
   default     = false
 }
+
+variable "existing_batch_s3_task_role_name" {
+  type        = string
+  description = "Name of existing IAM role for Batch S3 tasks. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_execution_role_name" {
+  type        = string
+  description = "Name of existing ECS execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "shared_iam_account_id" {
+  type        = string
+  description = "AWS account ID where IAM roles are hosted (separate from deployment account)"
+  default     = ""
+}

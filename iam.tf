@@ -16,6 +16,7 @@ data "aws_iam_policy_document" "batch_s3_task_role_assume_role" {
 }
 
 resource "aws_iam_role" "batch_s3_task_role" {
+  count = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name = local.batch_s3_task_role_name
 
   description = "Role for AWS Batch to Access Amazon S3 [METAFLOW_ECS_S3_ACCESS_IAM_ROLE]"
@@ -23,6 +24,11 @@ resource "aws_iam_role" "batch_s3_task_role" {
   assume_role_policy = data.aws_iam_policy_document.batch_s3_task_role_assume_role.json
 
   tags = var.tags
+}
+
+data "aws_iam_role" "existing_batch_s3_task_role" {
+  count = var.existing_batch_s3_task_role_name != "" ? 1 : 0
+  name  = var.existing_batch_s3_task_role_name
 }
 
 data "aws_iam_policy_document" "custom_s3_list_batch" {
@@ -201,50 +207,57 @@ data "aws_iam_policy_document" "cloudwatch" {
 }
 
 resource "aws_iam_role_policy" "grant_custom_s3_list_batch" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "s3_list"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.custom_s3_list_batch.json
 }
 
 resource "aws_iam_role_policy" "grant_custom_s3_batch" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "custom_s3"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.custom_s3_batch.json
 }
 
 resource "aws_iam_role_policy" "grant_s3_kms" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "s3_kms"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.s3_kms.json
 }
 
 resource "aws_iam_role_policy" "grant_deny_presigned_batch" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "deny_presigned"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.deny_presigned_batch.json
 }
 
 resource "aws_iam_role_policy" "grant_allow_sagemaker" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "sagemaker"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.allow_sagemaker.json
 }
 
 resource "aws_iam_role_policy" "grant_iam_pass_role" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "iam_pass_role"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.iam_pass_role.json
 }
 
 resource "aws_iam_role_policy" "grant_dynamodb" {
-  count  = var.enable_step_functions ? 1 : 0
+  count  = var.enable_step_functions && var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "dynamodb"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.dynamodb.json
 }
 
 resource "aws_iam_role_policy" "grant_cloudwatch" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "cloudwatch"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.cloudwatch.json
 }

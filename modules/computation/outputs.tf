@@ -9,7 +9,7 @@ output "batch_job_queue_arn" {
 }
 
 output "ecs_execution_role_arn" {
-  value       = aws_iam_role.ecs_execution_role.arn
+  value       = local.ecs_execution_role_arn_actual
   description = "The IAM role that grants access to ECS and Batch services which we'll use as our Metadata Service API's execution_role for our Fargate instance"
 }
 
