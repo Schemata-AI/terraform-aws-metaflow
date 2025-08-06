@@ -36,6 +36,10 @@ module "metaflow-metadata-service" {
   fargate_execution_role_arn       = module.metaflow-computation.ecs_execution_role_arn
   iam_partition                    = var.iam_partition
   metadata_service_container_image = local.metadata_service_container_image
+  
+  existing_metadata_ecs_task_role_name = var.existing_metadata_ecs_task_role_name
+  existing_lambda_execution_role_name = var.existing_lambda_execution_role_name
+  shared_iam_account_id = var.shared_iam_account_id
   metaflow_vpc_id                  = var.vpc_id
   rds_master_instance_endpoint     = module.metaflow-datastore.rds_master_instance_endpoint
   s3_bucket_arn                    = module.metaflow-datastore.s3_bucket_arn
@@ -100,6 +104,9 @@ module "metaflow-computation" {
   launch_template_http_put_response_hop_limit = var.launch_template_http_put_response_hop_limit
 
   existing_ecs_execution_role_name = var.existing_ecs_execution_role_name
+  existing_batch_execution_role_name = var.existing_batch_execution_role_name
+  existing_ecs_instance_role_name = var.existing_ecs_instance_role_name
+  existing_ecs_instance_profile_name = var.existing_ecs_instance_profile_name
   shared_iam_account_id = var.shared_iam_account_id
 
   standard_tags = var.tags
@@ -116,6 +123,10 @@ module "metaflow-step-functions" {
   iam_partition       = var.iam_partition
   s3_bucket_arn       = module.metaflow-datastore.s3_bucket_arn
   s3_bucket_kms_arn   = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
+
+  existing_eventbridge_role_name = var.existing_eventbridge_role_name
+  existing_step_functions_role_name = var.existing_step_functions_role_name
+  shared_iam_account_id = var.shared_iam_account_id
 
   standard_tags = var.tags
 }

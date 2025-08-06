@@ -14,11 +14,15 @@ data "aws_iam_policy_document" "lambda_ecs_execute_role" {
 }
 
 resource "aws_iam_role" "lambda_ecs_execute_role" {
+  count              = var.existing_lambda_execution_role_name == "" ? 1 : 0
   name               = local.lambda_ecs_execute_role_name
   assume_role_policy = data.aws_iam_policy_document.lambda_ecs_execute_role.json
 
   tags = var.standard_tags
 }
+
+# Note: We construct the ARN directly instead of using data source for existing roles
+# because the role exists in a different AWS account (shared_iam_account_id)
 
 data "aws_iam_policy_document" "lambda_ecs_task_execute_policy_cloudwatch" {
   statement {
@@ -67,14 +71,16 @@ data "aws_iam_policy_document" "lambda_ecs_task_execute_policy_vpc" {
 }
 
 resource "aws_iam_role_policy" "grant_lambda_ecs_cloudwatch" {
+  count  = var.existing_lambda_execution_role_name == "" ? 1 : 0
   name   = "cloudwatch"
-  role   = aws_iam_role.lambda_ecs_execute_role.name
+  role   = local.lambda_execution_role_name_actual
   policy = data.aws_iam_policy_document.lambda_ecs_task_execute_policy_cloudwatch.json
 }
 
 resource "aws_iam_role_policy" "grant_lambda_ecs_vpc" {
+  count  = var.existing_lambda_execution_role_name == "" ? 1 : 0
   name   = "ecs_task_execute"
-  role   = aws_iam_role.lambda_ecs_execute_role.name
+  role   = local.lambda_execution_role_name_actual
   policy = data.aws_iam_policy_document.lambda_ecs_task_execute_policy_vpc.json
 }
 
@@ -119,7 +125,7 @@ resource "aws_lambda_function" "db_migrate_lambda" {
   description      = "Trigger DB Migration"
   filename         = local.db_migrate_lambda_zip_file
   source_code_hash = data.archive_file.db_migrate_lambda.output_base64sha256
-  role             = aws_iam_role.lambda_ecs_execute_role.arn
+  role             = local.lambda_execution_role_arn_actual
   tags             = var.standard_tags
 
   environment {

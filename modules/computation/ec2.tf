@@ -12,7 +12,7 @@ resource "aws_launch_template" "cpu" {
   # Defines what IAM Role to assume to grant an Amazon EC2 instance
   # This role must have a policy to access the kms_key_id used to encrypt the EBS volume
   iam_instance_profile {
-    arn = aws_iam_instance_profile.ecs_instance_role.arn
+    arn = local.ecs_instance_profile_arn_actual
   }
 
   # Null image_id allows AWS Batch to decide.
@@ -45,8 +45,9 @@ resource "aws_launch_template" "cpu" {
  https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html
 */
 resource "aws_iam_instance_profile" "ecs_instance_role" {
+  count = var.existing_ecs_instance_profile_name == "" ? 1 : 0
   name = local.ecs_instance_role_name
-  role = aws_iam_role.ecs_instance_role.name
+  role = local.ecs_instance_role_name_actual
 }
 
 resource "aws_security_group" "this" {

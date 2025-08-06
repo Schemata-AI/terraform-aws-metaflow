@@ -114,3 +114,21 @@ variable "shared_iam_account_id" {
   description = "AWS account ID where IAM roles are hosted (separate from deployment account)"
   default     = ""
 }
+
+variable "existing_batch_execution_role_name" {
+  type        = string
+  description = "Name of existing Batch execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_instance_role_name" {
+  type        = string
+  description = "Name of existing ECS instance role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_instance_profile_name" {
+  type        = string
+  description = "Name of existing ECS instance profile. If provided, instance profile will not be created."
+  default     = ""
+}

@@ -53,7 +53,7 @@ EOF
 
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  task_role_arn            = aws_iam_role.metadata_svc_ecs_task_role.arn
+  task_role_arn            = local.metadata_ecs_task_role_arn_actual
   execution_role_arn       = var.fargate_execution_role_arn
   cpu                      = var.metadata_service_cpu
   memory                   = var.metadata_service_memory

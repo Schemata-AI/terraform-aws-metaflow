@@ -27,4 +27,12 @@ locals {
   lambda_ecs_execute_role_name = "${var.resource_prefix}lambda_ecs_execute${var.resource_suffix}"
 
   cloudwatch_logs_arn_prefix = "arn:${var.iam_partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}"
+  
+  # Reference to the metadata ECS task role (use wrapper role when cross-account, otherwise local role)
+  metadata_ecs_task_role_name_actual = var.existing_metadata_ecs_task_role_name != "" ? aws_iam_role.metadata_svc_ecs_task_wrapper_role.name : aws_iam_role.metadata_svc_ecs_task_role[0].name
+  metadata_ecs_task_role_arn_actual = var.existing_metadata_ecs_task_role_name != "" ? aws_iam_role.metadata_svc_ecs_task_wrapper_role.arn : aws_iam_role.metadata_svc_ecs_task_role[0].arn
+  
+  # Reference to the lambda execution role (either existing or created)
+  lambda_execution_role_name_actual = var.existing_lambda_execution_role_name != "" ? var.existing_lambda_execution_role_name : aws_iam_role.lambda_ecs_execute_role[0].name
+  lambda_execution_role_arn_actual = var.existing_lambda_execution_role_name != "" ? "arn:${var.iam_partition}:iam::${var.shared_iam_account_id}:role/${var.existing_lambda_execution_role_name}" : aws_iam_role.lambda_ecs_execute_role[0].arn
 }
