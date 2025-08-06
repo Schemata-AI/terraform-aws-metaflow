@@ -259,3 +259,27 @@ variable "existing_step_functions_role_name" {
   description = "Name of existing Step Functions role. If provided, role will not be created."
   default     = ""
 }
+
+variable "metadata_service_cpu" {
+  type        = number
+  default     = 512
+  description = "ECS task CPU units for metadata service (Fargate: 256, 512, 1024, 2048, 4096)"
+}
+
+variable "metadata_service_memory" {
+  type        = number
+  default     = 1024
+  description = "ECS task memory in MiB for metadata service"
+}
+
+variable "enable_fck_nat" {
+  type        = bool
+  default     = false
+  description = "Enable fck-nat instances for cost-optimized outbound internet access instead of NAT Gateway"
+}
+
+variable "fck_nat_instance_type" {
+  type        = string
+  default     = "t3.nano"
+  description = "Instance type for fck-nat instances (t3.nano recommended for cost optimization)"
+}

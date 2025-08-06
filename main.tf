@@ -36,6 +36,8 @@ module "metaflow-metadata-service" {
   fargate_execution_role_arn       = module.metaflow-computation.ecs_execution_role_arn
   iam_partition                    = var.iam_partition
   metadata_service_container_image = local.metadata_service_container_image
+  metadata_service_cpu             = var.metadata_service_cpu
+  metadata_service_memory          = var.metadata_service_memory
   
   existing_metadata_ecs_task_role_name = var.existing_metadata_ecs_task_role_name
   existing_lambda_execution_role_name = var.existing_lambda_execution_role_name

@@ -32,7 +32,7 @@ locals {
   metadata_ecs_task_role_name_actual = var.existing_metadata_ecs_task_role_name != "" ? aws_iam_role.metadata_svc_ecs_task_wrapper_role.name : aws_iam_role.metadata_svc_ecs_task_role[0].name
   metadata_ecs_task_role_arn_actual = var.existing_metadata_ecs_task_role_name != "" ? aws_iam_role.metadata_svc_ecs_task_wrapper_role.arn : aws_iam_role.metadata_svc_ecs_task_role[0].arn
   
-  # Reference to the lambda execution role (either existing or created)
-  lambda_execution_role_name_actual = var.existing_lambda_execution_role_name != "" ? var.existing_lambda_execution_role_name : aws_iam_role.lambda_ecs_execute_role[0].name
-  lambda_execution_role_arn_actual = var.existing_lambda_execution_role_name != "" ? "arn:${var.iam_partition}:iam::${var.shared_iam_account_id}:role/${var.existing_lambda_execution_role_name}" : aws_iam_role.lambda_ecs_execute_role[0].arn
+  # Reference to the lambda execution role (use wrapper role when cross-account, otherwise local role)
+  lambda_execution_role_name_actual = var.existing_lambda_execution_role_name != "" ? aws_iam_role.lambda_execution_wrapper_role[0].name : aws_iam_role.lambda_ecs_execute_role[0].name
+  lambda_execution_role_arn_actual = var.existing_lambda_execution_role_name != "" ? aws_iam_role.lambda_execution_wrapper_role[0].arn : aws_iam_role.lambda_ecs_execute_role[0].arn
 }

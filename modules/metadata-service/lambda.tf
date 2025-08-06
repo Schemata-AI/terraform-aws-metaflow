@@ -13,9 +13,20 @@ data "aws_iam_policy_document" "lambda_ecs_execute_role" {
   }
 }
 
+# Create wrapper role for Lambda execution when using existing cross-account role
+resource "aws_iam_role" "lambda_execution_wrapper_role" {
+  count = var.existing_lambda_execution_role_name != "" ? 1 : 0
+  name = "${var.resource_prefix}lambda-execution-wrapper${var.resource_suffix}"
+  description = "Wrapper role for Lambda execution with VPC and CloudWatch permissions"
+  assume_role_policy = data.aws_iam_policy_document.lambda_ecs_execute_role.json
+
+  tags = var.standard_tags
+}
+
+# Original Lambda execution role for when not using existing role
 resource "aws_iam_role" "lambda_ecs_execute_role" {
-  count              = var.existing_lambda_execution_role_name == "" ? 1 : 0
-  name               = local.lambda_ecs_execute_role_name
+  count = var.existing_lambda_execution_role_name == "" ? 1 : 0
+  name = local.lambda_ecs_execute_role_name
   assume_role_policy = data.aws_iam_policy_document.lambda_ecs_execute_role.json
 
   tags = var.standard_tags
@@ -70,6 +81,22 @@ data "aws_iam_policy_document" "lambda_ecs_task_execute_policy_vpc" {
   }
 }
 
+# Policy attachments for wrapper role when using existing cross-account role
+resource "aws_iam_role_policy" "grant_lambda_wrapper_cloudwatch" {
+  count  = var.existing_lambda_execution_role_name != "" ? 1 : 0
+  name   = "cloudwatch"
+  role   = aws_iam_role.lambda_execution_wrapper_role[0].name
+  policy = data.aws_iam_policy_document.lambda_ecs_task_execute_policy_cloudwatch.json
+}
+
+resource "aws_iam_role_policy" "grant_lambda_wrapper_vpc" {
+  count  = var.existing_lambda_execution_role_name != "" ? 1 : 0
+  name   = "ecs_task_execute"
+  role   = aws_iam_role.lambda_execution_wrapper_role[0].name
+  policy = data.aws_iam_policy_document.lambda_ecs_task_execute_policy_vpc.json
+}
+
+# Policy attachments for original role when not using existing role
 resource "aws_iam_role_policy" "grant_lambda_ecs_cloudwatch" {
   count  = var.existing_lambda_execution_role_name == "" ? 1 : 0
   name   = "cloudwatch"
