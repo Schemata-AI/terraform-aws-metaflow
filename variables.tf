@@ -22,6 +22,18 @@ variable "enable_custom_batch_container_registry" {
   description = "Provisions infrastructure for custom Amazon ECR container registry if enabled"
 }
 
+variable "use_ecr_for_metadata_service" {
+  type        = bool
+  default     = true
+  description = "Use ECR instead of Docker Hub for metadata service container image. This avoids internet connectivity issues."
+}
+
+variable "aws_profile" {
+  type        = string
+  default     = ""
+  description = "AWS profile to use for ECR operations. If empty, uses default profile."
+}
+
 variable "enable_step_functions" {
   type        = bool
   description = "Provisions infrastructure for step functions if enabled"

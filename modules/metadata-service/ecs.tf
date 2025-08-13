@@ -17,7 +17,7 @@ resource "aws_ecs_task_definition" "this" {
 [
   {
     "name": "${var.resource_prefix}service${var.resource_suffix}",
-    "image": "${var.metadata_service_container_image}",
+    "image": "${local.metadata_service_container_image}",
     "essential": true,
     "cpu": ${var.metadata_service_cpu},
     "memory": ${var.metadata_service_memory},

@@ -13,7 +13,9 @@ locals {
   metaflow_batch_image_name = "${local.resource_prefix}batch${local.resource_suffix}"
   metadata_service_container_image = (
     var.metadata_service_container_image == "" ?
-    module.metaflow-common.default_metadata_service_container_image :
+    (var.use_ecr_for_metadata_service ? 
+      "${data.aws_ecr_repository.metaflow_metadata_service[0].repository_url}:v2.3.0" :
+      module.metaflow-common.default_metadata_service_container_image) :
     var.metadata_service_container_image
   )
   ui_static_container_image = (

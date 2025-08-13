@@ -49,6 +49,8 @@ module "metaflow-metadata-service" {
   subnet2_id                       = var.subnet2_id
   vpc_cidr_blocks                  = var.vpc_cidr_blocks
   with_public_ip                   = var.with_public_ip
+  use_ecr_for_metadata_service     = var.use_ecr_for_metadata_service
+  ecr_repository_url               = var.use_ecr_for_metadata_service ? data.aws_ecr_repository.metaflow_metadata_service[0].repository_url : ""
 
   standard_tags = var.tags
 }
