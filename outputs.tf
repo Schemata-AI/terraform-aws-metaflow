@@ -128,3 +128,10 @@ output "batch_compute_environment_security_group_id" {
   value       = module.metaflow-computation.batch_compute_environment_security_group_id
   description = "The ID of the security group attached to the Batch Compute environment."
 }
+
+# Temporary output for database setup - REMOVE AFTER USE
+output "database_password" {
+  value       = module.metaflow-datastore.database_password
+  description = "Database password for manual setup"
+  sensitive   = true
+}

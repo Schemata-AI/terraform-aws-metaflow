@@ -45,6 +45,32 @@ resource "aws_iam_role_policy" "assume_shared_ecs_execution_role" {
   })
 }
 
+# Add CloudWatch Logs permissions to the wrapper role for ECS execution
+resource "aws_iam_role_policy" "wrapper_role_ecs_execution_permissions" {
+  count = var.existing_ecs_execution_role_name != "" ? 1 : 0
+  name = "ecs-execution-permissions"
+  role = aws_iam_role.ecs_execution_wrapper_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # Original ECS execution role for when not using existing role
 resource "aws_iam_role" "ecs_execution_role" {
   count = var.existing_ecs_execution_role_name == "" ? 1 : 0

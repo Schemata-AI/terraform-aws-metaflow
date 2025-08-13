@@ -5,3 +5,15 @@ resource "aws_ecr_repository" "metaflow_batch_image" {
 
   tags = var.tags
 }
+
+# ECR repository for metadata service
+resource "aws_ecr_repository" "metaflow_metadata_service" {
+  name                 = "metaflow-metadata-service"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+
+  tags = var.tags
+}
