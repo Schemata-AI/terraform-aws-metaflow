@@ -34,6 +34,17 @@ variable "aws_profile" {
   description = "AWS profile to use for ECR operations. If empty, uses default profile."
 }
 
+variable "database_ssl_mode" {
+  type        = string
+  description = "The metadata service database connection ssl mode"
+  default     = ""  # Empty means use default logic
+  
+  validation {
+    condition     = var.database_ssl_mode == "" || contains(["disable", "allow", "prefer", "require", "verify-ca", "verify-full"], var.database_ssl_mode)
+    error_message = "The database_ssl_mode variable must be empty or one of: disable, allow, prefer, require, verify-ca, verify-full."
+  }
+}
+
 variable "enable_step_functions" {
   type        = bool
   description = "Provisions infrastructure for step functions if enabled"

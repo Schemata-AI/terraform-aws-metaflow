@@ -26,9 +26,8 @@ locals {
 
   # RDS PostgreSQL >= 15 requires SSL by default
   # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL.Concepts.General.SSL.html#PostgreSQL.Concepts.General.SSL.Requiring
-  # Temporarily disable SSL for debugging database connectivity issues
-  # Original: database_ssl_mode = tonumber(split(".", var.db_engine_version)[0]) >= 15 ? "require" : "disable"
-  database_ssl_mode = "disable"
+  # Use user-provided SSL mode if specified, otherwise use default logic
+  database_ssl_mode = var.database_ssl_mode != "" ? var.database_ssl_mode : (tonumber(split(".", var.db_engine_version)[0]) >= 15 ? "require" : "disable")
   
   # Reference to the batch S3 task role (either existing or created)
   batch_s3_task_role_name_actual = var.existing_batch_s3_task_role_name != "" ? var.existing_batch_s3_task_role_name : aws_iam_role.batch_s3_task_role[0].name

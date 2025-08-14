@@ -57,6 +57,26 @@ locals {
   use_aurora = length(regexall("^aurora-", var.db_engine)) > 0
 }
 
+# DB Parameter Group to allow non-SSL connections for development
+resource "aws_db_parameter_group" "this" {
+  count  = local.use_aurora ? 0 : 1
+  family = "postgres15"
+  name   = "${var.resource_prefix}${var.db_name}-params${var.resource_suffix}"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "0"
+  }
+
+  tags = merge(
+    var.standard_tags,
+    {
+      Name     = "${var.resource_prefix}${var.db_name}-params${var.resource_suffix}"
+      Metaflow = "true"
+    }
+  )
+}
+
 resource "aws_rds_cluster" "this" {
   count              = local.use_aurora ? 1 : 0
   cluster_identifier = "${var.resource_prefix}${var.db_name}${var.resource_suffix}"
@@ -109,6 +129,7 @@ resource "aws_db_instance" "this" {
   username                  = var.db_username
   password                  = random_password.this.result
   db_subnet_group_name      = aws_db_subnet_group.this.id
+  parameter_group_name      = aws_db_parameter_group.this[0].name                          # Use parameter group to disable SSL requirement
   max_allocated_storage     = 1000                                                                                                           # Upper limit of automatic scaled storage
   multi_az                  = true                                                                                                           # Multiple availability zone?
   final_snapshot_identifier = "${var.resource_prefix}${var.db_name}-final-snapshot${var.resource_suffix}-${random_pet.final_snapshot_id.id}" # Snapshot upon delete
