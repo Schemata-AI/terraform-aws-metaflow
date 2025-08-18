@@ -21,7 +21,7 @@ locals {
 
   api_gateway_endpoint_configuration_type = local.is_gov ? "REGIONAL" : "EDGE"
   api_gateway_key_name                    = "${var.resource_prefix}key${var.resource_suffix}"
-  api_gateway_stage_name                  = "api"
+  api_gateway_stage_name                  = "metaflow"
   api_gateway_usage_plan_name             = "${var.resource_prefix}usage-plan${var.resource_suffix}"
 
   db_migrate_lambda_zip_file   = coalesce(var.db_migrate_lambda_zip_file, "${path.module}/db_migrate_lambda.zip")
