@@ -149,12 +149,11 @@ resource "aws_iam_role_policy" "fck_nat_ec2_permissions" {
 
 # Determine which subnets to use for fck-nat instances
 # fck-nat instances need public subnets (with IGW routes) to access the internet
-# We'll assume there are public subnets in the same VPC, or create them
 locals {
-  # For now, we'll use the provided subnets and assume they can route to internet
-  # In a production setup, you'd want dedicated public subnets for fck-nat
-  fck_nat_subnets = var.enable_fck_nat ? [var.subnet1_id, var.subnet2_id] : []
-  fck_nat_azs     = var.enable_fck_nat ? slice(data.aws_availability_zones.available.names, 0, 2) : []
+  # Use public subnets for fck-nat instances - they need internet access
+  # The provided subnet1_id and subnet2_id are private subnets, we need public ones
+  fck_nat_subnets = var.enable_fck_nat ? var.public_subnet_ids : []
+  fck_nat_azs     = var.enable_fck_nat ? slice(data.aws_availability_zones.available.names, 0, length(var.public_subnet_ids)) : []
 }
 
 # Create fck-nat instances in multiple AZs for high availability

@@ -172,6 +172,11 @@ variable "subnet2_id" {
   description = "Second subnet used for availability zone redundancy"
 }
 
+variable "public_subnet_ids" {
+  type        = list(string)
+  description = "List of public subnet IDs for fck-nat instances. fck-nat instances need public subnets to access the internet."
+}
+
 variable "vpc_cidr_blocks" {
   type        = list(string)
   description = "The VPC CIDR blocks that we'll access list on our Metadata Service API to allow all internal communications"
