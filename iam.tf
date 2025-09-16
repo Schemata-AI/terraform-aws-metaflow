@@ -200,6 +200,22 @@ data "aws_iam_policy_document" "cloudwatch" {
   }
 }
 
+data "aws_iam_policy_document" "secrets_manager" {
+  statement {
+    sid = "AllowSecretsManagerAccess"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
 resource "aws_iam_role_policy" "grant_custom_s3_list_batch" {
   name   = "s3_list"
   role   = aws_iam_role.batch_s3_task_role.name
@@ -247,4 +263,10 @@ resource "aws_iam_role_policy" "grant_cloudwatch" {
   name   = "cloudwatch"
   role   = aws_iam_role.batch_s3_task_role.name
   policy = data.aws_iam_policy_document.cloudwatch.json
+}
+
+resource "aws_iam_role_policy" "grant_secrets_manager" {
+  name   = "secrets_manager"
+  role   = aws_iam_role.batch_s3_task_role.name
+  policy = data.aws_iam_policy_document.secrets_manager.json
 }
