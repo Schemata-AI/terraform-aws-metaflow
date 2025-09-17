@@ -35,7 +35,9 @@ data "aws_iam_policy_document" "custom_s3_list_batch" {
     effect = "Allow"
 
     resources = [
-      module.metaflow-datastore.s3_bucket_arn
+      module.metaflow-datastore.s3_bucket_arn,
+      "arn:${var.iam_partition}:s3:::schemata-assets-*",
+      "arn:${var.iam_partition}:s3:::schemata--app-assets-*"
     ]
   }
 }
@@ -52,7 +54,9 @@ data "aws_iam_policy_document" "custom_s3_batch" {
     effect = "Allow"
 
     resources = [
-      "${module.metaflow-datastore.s3_bucket_arn}/*"
+      "${module.metaflow-datastore.s3_bucket_arn}/*",
+      "arn:${var.iam_partition}:s3:::schemata-assets-*/*",
+      "arn:${var.iam_partition}:s3:::schemata--app-assets-*/*"
     ]
   }
 }
