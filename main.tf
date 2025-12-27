@@ -99,6 +99,14 @@ module "metaflow-computation" {
   launch_template_http_tokens                 = var.launch_template_http_tokens
   launch_template_http_put_response_hop_limit = var.launch_template_http_put_response_hop_limit
 
+  # CPU compute environment
+  enable_cpu_compute_environment              = var.enable_cpu_compute_environment
+  cpu_compute_environment_instance_types      = var.cpu_compute_environment_instance_types
+  cpu_compute_environment_min_vcpus           = var.cpu_compute_environment_min_vcpus
+  cpu_compute_environment_desired_vcpus       = var.cpu_compute_environment_desired_vcpus
+  cpu_compute_environment_max_vcpus           = var.cpu_compute_environment_max_vcpus
+  cpu_compute_environment_allocation_strategy = var.cpu_compute_environment_allocation_strategy
+
   standard_tags = var.tags
 }
 
@@ -113,6 +121,9 @@ module "metaflow-step-functions" {
   iam_partition       = var.iam_partition
   s3_bucket_arn       = module.metaflow-datastore.s3_bucket_arn
   s3_bucket_kms_arn   = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
+
+  # Include CPU queue in allowed batch job queues if enabled
+  additional_batch_job_queue_arns = var.enable_cpu_compute_environment ? [module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE] : []
 
   standard_tags = var.tags
 }

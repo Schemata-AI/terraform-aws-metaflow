@@ -102,3 +102,43 @@ variable "launch_template_image_id" {
   nullable    = true
   default     = null
 }
+
+# ============================================================================
+# CPU Compute Environment Variables
+# ============================================================================
+
+variable "enable_cpu_compute_environment" {
+  type        = bool
+  description = "Whether to create a separate CPU-only compute environment and job queue"
+  default     = false
+}
+
+variable "cpu_compute_environment_instance_types" {
+  type        = list(string)
+  description = "The instance types for the CPU compute environment"
+  default     = ["m5.large", "m5.xlarge", "m5.2xlarge", "c5.large", "c5.xlarge", "c5.2xlarge"]
+}
+
+variable "cpu_compute_environment_min_vcpus" {
+  type        = number
+  description = "Minimum VCPUs for CPU Batch Compute Environment"
+  default     = 0
+}
+
+variable "cpu_compute_environment_desired_vcpus" {
+  type        = number
+  description = "Desired Starting VCPUs for CPU Batch Compute Environment"
+  default     = 0
+}
+
+variable "cpu_compute_environment_max_vcpus" {
+  type        = number
+  description = "Maximum VCPUs for CPU Batch Compute Environment"
+  default     = 32
+}
+
+variable "cpu_compute_environment_allocation_strategy" {
+  type        = string
+  default     = "BEST_FIT_PROGRESSIVE"
+  description = "Allocation strategy for CPU Batch Compute environment (BEST_FIT, BEST_FIT_PROGRESSIVE, SPOT_CAPACITY_OPTIMIZED)"
+}

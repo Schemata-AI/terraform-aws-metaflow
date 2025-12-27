@@ -1,6 +1,16 @@
 output "METAFLOW_BATCH_JOB_QUEUE" {
   value       = module.metaflow-computation.METAFLOW_BATCH_JOB_QUEUE
-  description = "AWS Batch Job Queue ARN for Metaflow"
+  description = "AWS Batch Job Queue ARN for Metaflow (default/GPU queue)"
+}
+
+output "METAFLOW_BATCH_GPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_GPU_JOB_QUEUE
+  description = "AWS Batch Job Queue ARN for Metaflow GPU workloads"
+}
+
+output "METAFLOW_BATCH_CPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE
+  description = "AWS Batch Job Queue ARN for Metaflow CPU-only workloads"
 }
 
 output "METAFLOW_DATASTORE_SYSROOT_S3" {
@@ -79,6 +89,11 @@ output "metaflow_profile_json" {
       } : {},
       var.batch_type == "fargate" ? {
         "METAFLOW_ECS_FARGATE_EXECUTION_ROLE" = module.metaflow-computation.ecs_execution_role_arn
+      } : {},
+      # Add CPU/GPU queue ARNs if CPU compute environment is enabled
+      var.enable_cpu_compute_environment ? {
+        "METAFLOW_BATCH_CPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_GPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_GPU_JOB_QUEUE
       } : {},
       {
         "METAFLOW_DATASTORE_SYSROOT_S3"       = module.metaflow-datastore.METAFLOW_DATASTORE_SYSROOT_S3,
