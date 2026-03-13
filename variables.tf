@@ -16,6 +16,12 @@ variable "db_migrate_lambda_zip_file" {
   default     = null
 }
 
+variable "additional_lambda_log_group_names" {
+  type        = list(string)
+  description = "Additional Lambda function names whose log groups should be writable by lambda_ecs_execute role"
+  default     = []
+}
+
 variable "enable_custom_batch_container_registry" {
   type        = bool
   default     = false

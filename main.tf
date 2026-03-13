@@ -30,6 +30,7 @@ module "metaflow-metadata-service" {
   database_username                = module.metaflow-datastore.database_username
   database_ssl_mode                = local.database_ssl_mode
   db_migrate_lambda_zip_file       = var.db_migrate_lambda_zip_file
+  additional_lambda_log_group_names = var.additional_lambda_log_group_names
   datastore_s3_bucket_kms_key_arn  = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
   enable_api_basic_auth            = var.metadata_service_enable_api_basic_auth
   enable_api_gateway               = var.metadata_service_enable_api_gateway

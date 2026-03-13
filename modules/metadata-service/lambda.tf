@@ -43,9 +43,10 @@ data "aws_iam_policy_document" "lambda_ecs_task_execute_policy_cloudwatch" {
       "logs:CreateLogStream"
     ]
 
-    resources = [
-      "${local.cloudwatch_logs_arn_prefix}:log-group:/aws/lambda/${local.db_migrate_lambda_name}:*"
-    ]
+    resources = concat(
+      ["${local.cloudwatch_logs_arn_prefix}:log-group:/aws/lambda/${local.db_migrate_lambda_name}:*"],
+      [for name in var.additional_lambda_log_group_names : "${local.cloudwatch_logs_arn_prefix}:log-group:/aws/lambda/${name}:*"]
+    )
   }
 }
 

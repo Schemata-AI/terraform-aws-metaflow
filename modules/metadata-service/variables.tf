@@ -55,6 +55,12 @@ variable "db_migrate_lambda_zip_file" {
   default     = null
 }
 
+variable "additional_lambda_log_group_names" {
+  type        = list(string)
+  description = "Additional Lambda function names whose log groups should be writable by lambda_ecs_execute role"
+  default     = []
+}
+
 variable "fargate_execution_role_arn" {
   type        = string
   description = "The IAM role that grants access to ECS and Batch services which we'll use as our Metadata Service API's execution_role for our Fargate instance"
