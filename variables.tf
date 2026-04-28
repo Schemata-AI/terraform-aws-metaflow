@@ -67,6 +67,12 @@ variable "compute_environment_max_vcpus" {
   default     = 64
 }
 
+variable "compute_environment_allocation_strategy" {
+  type        = string
+  default     = "BEST_FIT"
+  description = "Allocation strategy for GPU/default Batch compute environment (BEST_FIT, BEST_FIT_PROGRESSIVE, SPOT_CAPACITY_OPTIMIZED)"
+}
+
 variable "compute_environment_egress_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]

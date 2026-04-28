@@ -91,6 +91,7 @@ module "metaflow-computation" {
   compute_environment_instance_types          = var.compute_environment_instance_types
   compute_environment_max_vcpus               = var.compute_environment_max_vcpus
   compute_environment_min_vcpus               = var.compute_environment_min_vcpus
+  compute_environment_allocation_strategy     = var.compute_environment_allocation_strategy
   compute_environment_egress_cidr_blocks      = var.compute_environment_egress_cidr_blocks
   iam_partition                               = var.iam_partition
   metaflow_vpc_id                             = var.vpc_id
