@@ -14,6 +14,16 @@ variable "db_engine_version" {
   default = "11"
 }
 
+variable "db_allow_major_version_upgrade" {
+  type    = bool
+  default = false
+}
+
+variable "db_apply_immediately" {
+  type    = bool
+  default = false
+}
+
 variable "db_name" {
   type        = string
   description = "Name of PostgresQL database for Metaflow service."

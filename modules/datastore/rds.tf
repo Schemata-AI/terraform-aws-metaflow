@@ -71,6 +71,9 @@ resource "aws_rds_cluster" "this" {
   engine_version    = var.db_engine_version
   storage_encrypted = true
 
+  allow_major_version_upgrade = var.db_allow_major_version_upgrade
+  apply_immediately           = var.db_apply_immediately
+
   final_snapshot_identifier = "${var.resource_prefix}${var.db_name}-final-snapshot${var.resource_suffix}-${random_pet.final_snapshot_id.id}" # Snapshot upon delete
   vpc_security_group_ids    = [aws_security_group.rds_security_group.id]
 
@@ -96,14 +99,18 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
  Define rds db instance.
 */
 resource "aws_db_instance" "this" {
-  count                     = local.use_aurora ? 0 : 1
-  publicly_accessible       = false
-  allocated_storage         = 20    # Allocate 20GB
-  storage_type              = "gp2" # general purpose SSD
-  storage_encrypted         = true
-  kms_key_id                = aws_kms_key.rds.arn
-  engine                    = var.db_engine
-  engine_version            = var.db_engine_version
+  count               = local.use_aurora ? 0 : 1
+  publicly_accessible = false
+  allocated_storage   = 20    # Allocate 20GB
+  storage_type        = "gp2" # general purpose SSD
+  storage_encrypted   = true
+  kms_key_id          = aws_kms_key.rds.arn
+  engine              = var.db_engine
+  engine_version      = var.db_engine_version
+
+  allow_major_version_upgrade = var.db_allow_major_version_upgrade
+  apply_immediately           = var.db_apply_immediately
+
   instance_class            = var.db_instance_type                                         # Hardware configuration
   identifier                = "${var.resource_prefix}${var.db_name}${var.resource_suffix}" # used for dns hostname needs to be customer unique in region
   name                      = var.db_name                                                  # unique id for CLI commands (name of DB table which is why we're not adding the prefix as no conflicts will occur and the API expects this table name)

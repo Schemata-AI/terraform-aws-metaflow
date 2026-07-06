@@ -90,6 +90,16 @@ variable "db_engine_version" {
   default = "11"
 }
 
+variable "db_allow_major_version_upgrade" {
+  type    = bool
+  default = false
+}
+
+variable "db_apply_immediately" {
+  type    = bool
+  default = false
+}
+
 variable "launch_template_http_endpoint" {
   type        = string
   description = "Whether the metadata service is available. Can be 'enabled' or 'disabled'"
