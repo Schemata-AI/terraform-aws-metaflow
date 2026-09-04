@@ -169,22 +169,22 @@ resource "aws_batch_scheduling_policy" "tessera" {
     share_decay_seconds = 3600
 
     share_distribution {
-      share_identifier = "tessera-production"
+      share_identifier = "tesseraProduction"
       weight_factor    = 0.25
     }
 
     share_distribution {
-      share_identifier = "tessera-staging"
+      share_identifier = "tesseraStaging"
       weight_factor    = 1
     }
 
     share_distribution {
-      share_identifier = "tessera-development"
+      share_identifier = "tesseraDevelopment"
       weight_factor    = 1
     }
 
     share_distribution {
-      share_identifier = "tessera-eval"
+      share_identifier = "tesseraEval"
       weight_factor    = 1
     }
   }
