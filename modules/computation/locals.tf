@@ -15,6 +15,11 @@ locals {
   # Name of CPU-only Batch Queue
   cpu_batch_queue_name = replace("${var.resource_prefix}cpu${var.resource_suffix}", "--", "-")
 
+  # Fair-share queues (Tessera Step Functions). FIFO queues above stay unchanged.
+  fairshare_policy_name          = replace("${var.resource_prefix}fairshare-policy${var.resource_suffix}", "--", "-")
+  fairshare_batch_queue_name     = replace("${var.resource_prefix}fairshare${var.resource_suffix}", "--", "-")
+  cpu_fairshare_batch_queue_name = replace("${var.resource_prefix}cpu-fairshare${var.resource_suffix}", "--", "-")
+
   # Name of IAM role to create to manage ECS tasks
   ecs_execution_role_name = "${var.resource_prefix}ecs-execution-role${var.resource_suffix}"
 

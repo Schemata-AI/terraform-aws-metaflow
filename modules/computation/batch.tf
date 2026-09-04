@@ -158,3 +158,61 @@ resource "aws_batch_job_queue" "cpu" {
 
   tags = var.standard_tags
 }
+
+# Staged rollout: create these queues first (dev ML-infra). Point Tessera SFNs
+# at them in a later deploy. Roll back by pointing SFNs at FIFO; do not delete FIFO.
+resource "aws_batch_scheduling_policy" "tessera" {
+  name = local.fairshare_policy_name
+
+  fair_share_policy {
+    compute_reservation = 0
+    share_decay_seconds = 3600
+
+    share_distribution {
+      share_identifier = "tessera-production"
+      weight_factor    = 0.25
+    }
+
+    share_distribution {
+      share_identifier = "tessera-staging"
+      weight_factor    = 1
+    }
+
+    share_distribution {
+      share_identifier = "tessera-development"
+      weight_factor    = 1
+    }
+
+    share_distribution {
+      share_identifier = "tessera-eval"
+      weight_factor    = 1
+    }
+  }
+
+  tags = var.standard_tags
+}
+
+resource "aws_batch_job_queue" "fairshare" {
+  name                  = local.fairshare_batch_queue_name
+  state                 = "ENABLED"
+  priority              = 2
+  scheduling_policy_arn = aws_batch_scheduling_policy.tessera.arn
+  compute_environments = [
+    aws_batch_compute_environment.this.arn
+  ]
+
+  tags = var.standard_tags
+}
+
+resource "aws_batch_job_queue" "cpu_fairshare" {
+  count                 = var.enable_cpu_compute_environment && !local.enable_fargate_on_batch ? 1 : 0
+  name                  = local.cpu_fairshare_batch_queue_name
+  state                 = "ENABLED"
+  priority              = 2
+  scheduling_policy_arn = aws_batch_scheduling_policy.tessera.arn
+  compute_environments = [
+    aws_batch_compute_environment.cpu[0].arn
+  ]
+
+  tags = var.standard_tags
+}

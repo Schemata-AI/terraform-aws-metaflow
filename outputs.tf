@@ -13,6 +13,21 @@ output "METAFLOW_BATCH_CPU_JOB_QUEUE" {
   description = "AWS Batch Job Queue ARN for Metaflow CPU-only workloads"
 }
 
+output "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE
+  description = "Fair-share GPU/default Batch queue ARN for Tessera Step Functions"
+}
+
+output "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE
+  description = "Fair-share GPU Batch queue ARN for Tessera Step Functions"
+}
+
+output "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE
+  description = "Fair-share CPU Batch queue ARN for Tessera Step Functions"
+}
+
 output "METAFLOW_DATASTORE_SYSROOT_S3" {
   value       = module.metaflow-datastore.METAFLOW_DATASTORE_SYSROOT_S3
   description = "Amazon S3 URL for Metaflow DataStore"
@@ -92,9 +107,16 @@ output "metaflow_profile_json" {
       } : {},
       # Add CPU/GPU queue ARNs if CPU compute environment is enabled
       var.enable_cpu_compute_environment ? {
-        "METAFLOW_BATCH_CPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE,
-        "METAFLOW_BATCH_GPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_GPU_JOB_QUEUE
-      } : {},
+        "METAFLOW_BATCH_CPU_JOB_QUEUE"           = module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_GPU_JOB_QUEUE"           = module.metaflow-computation.METAFLOW_BATCH_GPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE"     = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE
+        } : {
+        "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE"     = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE
+      },
       {
         "METAFLOW_DATASTORE_SYSROOT_S3"       = module.metaflow-datastore.METAFLOW_DATASTORE_SYSROOT_S3,
         "METAFLOW_DATATOOLS_S3ROOT"           = module.metaflow-datastore.METAFLOW_DATATOOLS_S3ROOT,
