@@ -30,4 +30,7 @@ locals {
   ecs_instance_role_name = "${var.resource_prefix}ecs-iam-role${var.resource_suffix}"
 
   enable_fargate_on_batch = var.batch_type == "fargate"
+
+  # Shared Tessera fair-share queues live only in the development Batch account.
+  enable_fairshare_job_queues = lookup(var.standard_tags, "env", "") == "development"
 }
