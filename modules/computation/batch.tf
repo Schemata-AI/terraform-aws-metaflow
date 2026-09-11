@@ -162,7 +162,8 @@ resource "aws_batch_job_queue" "cpu" {
 # Staged rollout: create these queues first (dev ML-infra). Point Tessera SFNs
 # at them in a later deploy. Roll back by pointing SFNs at FIFO; do not delete FIFO.
 resource "aws_batch_scheduling_policy" "tessera" {
-  name = local.fairshare_policy_name
+  count = local.enable_fairshare_job_queues ? 1 : 0
+  name  = local.fairshare_policy_name
 
   fair_share_policy {
     compute_reservation = 0
@@ -193,10 +194,11 @@ resource "aws_batch_scheduling_policy" "tessera" {
 }
 
 resource "aws_batch_job_queue" "fairshare" {
+  count                 = local.enable_fairshare_job_queues ? 1 : 0
   name                  = local.fairshare_batch_queue_name
   state                 = "ENABLED"
   priority              = 2
-  scheduling_policy_arn = aws_batch_scheduling_policy.tessera.arn
+  scheduling_policy_arn = aws_batch_scheduling_policy.tessera[0].arn
   compute_environments = [
     aws_batch_compute_environment.this.arn
   ]
@@ -205,11 +207,11 @@ resource "aws_batch_job_queue" "fairshare" {
 }
 
 resource "aws_batch_job_queue" "cpu_fairshare" {
-  count                 = var.enable_cpu_compute_environment && !local.enable_fargate_on_batch ? 1 : 0
+  count                 = local.enable_fairshare_job_queues && var.enable_cpu_compute_environment && !local.enable_fargate_on_batch ? 1 : 0
   name                  = local.cpu_fairshare_batch_queue_name
   state                 = "ENABLED"
   priority              = 2
-  scheduling_policy_arn = aws_batch_scheduling_policy.tessera.arn
+  scheduling_policy_arn = aws_batch_scheduling_policy.tessera[0].arn
   compute_environments = [
     aws_batch_compute_environment.cpu[0].arn
   ]
