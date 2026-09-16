@@ -24,22 +24,22 @@ output "cpu_batch_job_queue_arn" {
 }
 
 output "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE" {
-  value       = aws_batch_job_queue.fairshare.arn
+  value       = local.enable_fairshare_job_queues ? aws_batch_job_queue.fairshare[0].arn : ""
   description = "Fair-share GPU/default Batch queue ARN for Tessera Step Functions"
 }
 
 output "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" {
-  value       = aws_batch_job_queue.fairshare.arn
+  value       = local.enable_fairshare_job_queues ? aws_batch_job_queue.fairshare[0].arn : ""
   description = "Fair-share GPU Batch queue ARN for Tessera Step Functions"
 }
 
 output "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" {
-  value       = var.enable_cpu_compute_environment && !local.enable_fargate_on_batch ? aws_batch_job_queue.cpu_fairshare[0].arn : aws_batch_job_queue.fairshare.arn
+  value       = local.enable_fairshare_job_queues ? (var.enable_cpu_compute_environment && !local.enable_fargate_on_batch ? aws_batch_job_queue.cpu_fairshare[0].arn : aws_batch_job_queue.fairshare[0].arn) : ""
   description = "Fair-share CPU Batch queue ARN for Tessera Step Functions"
 }
 
 output "batch_fairshare_scheduling_policy_arn" {
-  value       = aws_batch_scheduling_policy.tessera.arn
+  value       = local.enable_fairshare_job_queues ? aws_batch_scheduling_policy.tessera[0].arn : ""
   description = "ARN of the Tessera fair-share scheduling policy"
 }
 
