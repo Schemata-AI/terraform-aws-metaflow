@@ -39,7 +39,10 @@ data "aws_iam_policy_document" "custom_s3_list_batch" {
     effect = "Allow"
 
     resources = [
-      module.metaflow-datastore.s3_bucket_arn
+      module.metaflow-datastore.s3_bucket_arn,
+      "arn:${var.iam_partition}:s3:::schemata-assets-*",
+      "arn:${var.iam_partition}:s3:::schemata--app-assets-*",
+      "arn:${var.iam_partition}:s3:::schemata-self-serve-inputs-*"
     ]
   }
 }
@@ -56,7 +59,10 @@ data "aws_iam_policy_document" "custom_s3_batch" {
     effect = "Allow"
 
     resources = [
-      "${module.metaflow-datastore.s3_bucket_arn}/*"
+      "${module.metaflow-datastore.s3_bucket_arn}/*",
+      "arn:${var.iam_partition}:s3:::schemata-assets-*/*",
+      "arn:${var.iam_partition}:s3:::schemata--app-assets-*/*",
+      "arn:${var.iam_partition}:s3:::schemata-self-serve-inputs-*/*"
     ]
   }
 }
@@ -204,6 +210,22 @@ data "aws_iam_policy_document" "cloudwatch" {
   }
 }
 
+data "aws_iam_policy_document" "secrets_manager" {
+  statement {
+    sid = "AllowSecretsManagerAccess"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+
+    effect = "Allow"
+
+    resources = [
+      "*"
+    ]
+  }
+}
+
 resource "aws_iam_role_policy" "grant_custom_s3_list_batch" {
   count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "s3_list"
@@ -258,4 +280,10 @@ resource "aws_iam_role_policy" "grant_cloudwatch" {
   name   = "cloudwatch"
   role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.cloudwatch.json
+}
+
+resource "aws_iam_role_policy" "grant_secrets_manager" {
+  name   = "secrets_manager"
+  role   = aws_iam_role.batch_s3_task_role.name
+  policy = data.aws_iam_policy_document.secrets_manager.json
 }

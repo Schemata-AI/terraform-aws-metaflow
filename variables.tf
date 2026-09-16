@@ -16,6 +16,12 @@ variable "db_migrate_lambda_zip_file" {
   default     = null
 }
 
+variable "additional_lambda_log_group_names" {
+  type        = list(string)
+  description = "Additional Lambda function names whose log groups should be writable by lambda_ecs_execute role"
+  default     = []
+}
+
 variable "enable_custom_batch_container_registry" {
   type        = bool
   default     = false
@@ -84,6 +90,12 @@ variable "compute_environment_max_vcpus" {
   default     = 64
 }
 
+variable "compute_environment_allocation_strategy" {
+  type        = string
+  default     = "BEST_FIT"
+  description = "Allocation strategy for GPU/default Batch compute environment (BEST_FIT, BEST_FIT_PROGRESSIVE, SPOT_CAPACITY_OPTIMIZED)"
+}
+
 variable "compute_environment_egress_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
@@ -99,6 +111,16 @@ variable "db_instance_type" {
 variable "db_engine_version" {
   type    = string
   default = "11"
+}
+
+variable "db_allow_major_version_upgrade" {
+  type    = bool
+  default = false
+}
+
+variable "db_apply_immediately" {
+  type    = bool
+  default = false
 }
 
 variable "launch_template_http_endpoint" {
@@ -226,6 +248,46 @@ variable "enable_key_rotation" {
   type        = bool
   description = "Enable key rotation for KMS keys"
   default     = false
+}
+
+# ============================================================================
+# CPU Compute Environment Variables
+# ============================================================================
+
+variable "enable_cpu_compute_environment" {
+  type        = bool
+  description = "Whether to create a separate CPU-only compute environment and job queue"
+  default     = false
+}
+
+variable "cpu_compute_environment_instance_types" {
+  type        = list(string)
+  description = "The instance types for the CPU compute environment"
+  default     = ["m5.large", "m5.xlarge", "m5.2xlarge", "c5.large", "c5.xlarge", "c5.2xlarge"]
+}
+
+variable "cpu_compute_environment_min_vcpus" {
+  type        = number
+  description = "Minimum VCPUs for CPU Batch Compute Environment"
+  default     = 0
+}
+
+variable "cpu_compute_environment_desired_vcpus" {
+  type        = number
+  description = "Desired Starting VCPUs for CPU Batch Compute Environment"
+  default     = 0
+}
+
+variable "cpu_compute_environment_max_vcpus" {
+  type        = number
+  description = "Maximum VCPUs for CPU Batch Compute Environment"
+  default     = 32
+}
+
+variable "cpu_compute_environment_allocation_strategy" {
+  type        = string
+  default     = "BEST_FIT_PROGRESSIVE"
+  description = "Allocation strategy for CPU Batch Compute environment (BEST_FIT, BEST_FIT_PROGRESSIVE, SPOT_CAPACITY_OPTIMIZED)"
 }
 
 variable "existing_batch_s3_task_role_name" {

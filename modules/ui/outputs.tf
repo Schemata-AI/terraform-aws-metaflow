@@ -8,3 +8,8 @@ output "alb_arn" {
   value       = aws_lb.this.arn
   description = "UI ALB ARN"
 }
+
+output "alb_zone_id" {
+  value       = aws_lb.this.zone_id
+  description = "UI ALB Zone ID"
+}

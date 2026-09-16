@@ -1,6 +1,31 @@
 output "METAFLOW_BATCH_JOB_QUEUE" {
   value       = module.metaflow-computation.METAFLOW_BATCH_JOB_QUEUE
-  description = "AWS Batch Job Queue ARN for Metaflow"
+  description = "AWS Batch Job Queue ARN for Metaflow (default/GPU queue)"
+}
+
+output "METAFLOW_BATCH_GPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_GPU_JOB_QUEUE
+  description = "AWS Batch Job Queue ARN for Metaflow GPU workloads"
+}
+
+output "METAFLOW_BATCH_CPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE
+  description = "AWS Batch Job Queue ARN for Metaflow CPU-only workloads"
+}
+
+output "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE
+  description = "Fair-share GPU/default Batch queue ARN for Tessera Step Functions"
+}
+
+output "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE
+  description = "Fair-share GPU Batch queue ARN for Tessera Step Functions"
+}
+
+output "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" {
+  value       = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE
+  description = "Fair-share CPU Batch queue ARN for Tessera Step Functions"
 }
 
 output "METAFLOW_DATASTORE_SYSROOT_S3" {
@@ -80,6 +105,18 @@ output "metaflow_profile_json" {
       var.batch_type == "fargate" ? {
         "METAFLOW_ECS_FARGATE_EXECUTION_ROLE" = module.metaflow-computation.ecs_execution_role_arn
       } : {},
+      # Add CPU/GPU queue ARNs if CPU compute environment is enabled
+      var.enable_cpu_compute_environment ? {
+        "METAFLOW_BATCH_CPU_JOB_QUEUE"           = module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_GPU_JOB_QUEUE"           = module.metaflow-computation.METAFLOW_BATCH_GPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE"     = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE
+        } : {
+        "METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE" = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_GPU_JOB_QUEUE,
+        "METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE"     = module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE
+      },
       {
         "METAFLOW_DATASTORE_SYSROOT_S3"       = module.metaflow-datastore.METAFLOW_DATASTORE_SYSROOT_S3,
         "METAFLOW_DATATOOLS_S3ROOT"           = module.metaflow-datastore.METAFLOW_DATATOOLS_S3ROOT,
@@ -122,6 +159,11 @@ output "ui_alb_dns_name" {
 output "ui_alb_arn" {
   value       = (length(module.metaflow-ui) > 0) ? module.metaflow-ui[0].alb_arn : ""
   description = "UI ALB ARN"
+}
+
+output "ui_alb_zone_id" {
+  value       = (length(module.metaflow-ui) > 0) ? module.metaflow-ui[0].alb_zone_id : ""
+  description = "UI ALB Zone ID"
 }
 
 output "batch_compute_environment_security_group_id" {

@@ -6,7 +6,13 @@ variable "active" {
 
 variable "batch_job_queue_arn" {
   type        = string
-  description = "Batch job queue arn"
+  description = "Batch job queue arn (default/GPU queue)"
+}
+
+variable "additional_batch_job_queue_arns" {
+  type        = list(string)
+  description = "Additional batch job queue ARNs that Step Functions can submit jobs to (e.g., CPU queue)"
+  default     = []
 }
 
 variable "iam_partition" {

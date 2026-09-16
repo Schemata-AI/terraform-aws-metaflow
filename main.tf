@@ -12,8 +12,10 @@ module "metaflow-datastore" {
   subnet1_id                         = var.subnet1_id
   subnet2_id                         = var.subnet2_id
 
-  db_instance_type  = var.db_instance_type
-  db_engine_version = var.db_engine_version
+  db_instance_type               = var.db_instance_type
+  db_engine_version              = var.db_engine_version
+  db_allow_major_version_upgrade = var.db_allow_major_version_upgrade
+  db_apply_immediately           = var.db_apply_immediately
 
   standard_tags = var.tags
 }
@@ -24,33 +26,33 @@ module "metaflow-metadata-service" {
   resource_prefix = local.resource_prefix
   resource_suffix = local.resource_suffix
 
-  access_list_cidr_blocks          = var.access_list_cidr_blocks
-  database_name                    = module.metaflow-datastore.database_name
-  database_password                = module.metaflow-datastore.database_password
-  database_username                = module.metaflow-datastore.database_username
-  database_ssl_mode                = local.database_ssl_mode
-  db_migrate_lambda_zip_file       = var.db_migrate_lambda_zip_file
-  datastore_s3_bucket_kms_key_arn  = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
-  enable_api_basic_auth            = var.metadata_service_enable_api_basic_auth
-  enable_api_gateway               = var.metadata_service_enable_api_gateway
-  fargate_execution_role_arn       = module.metaflow-computation.ecs_execution_role_arn
-  iam_partition                    = var.iam_partition
-  metadata_service_container_image = local.metadata_service_container_image
-  metadata_service_cpu             = var.metadata_service_cpu
-  metadata_service_memory          = var.metadata_service_memory
-  
+  access_list_cidr_blocks           = var.access_list_cidr_blocks
+  database_name                     = module.metaflow-datastore.database_name
+  database_password                 = module.metaflow-datastore.database_password
+  database_username                 = module.metaflow-datastore.database_username
+  database_ssl_mode                 = local.database_ssl_mode
+  db_migrate_lambda_zip_file        = var.db_migrate_lambda_zip_file
+  additional_lambda_log_group_names = var.additional_lambda_log_group_names
+  datastore_s3_bucket_kms_key_arn   = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
+  enable_api_basic_auth             = var.metadata_service_enable_api_basic_auth
+  enable_api_gateway                = var.metadata_service_enable_api_gateway
+  fargate_execution_role_arn        = module.metaflow-computation.ecs_execution_role_arn
+  iam_partition                     = var.iam_partition
+  metadata_service_container_image  = local.metadata_service_container_image
+  metadata_service_cpu              = var.metadata_service_cpu
+  metadata_service_memory           = var.metadata_service_memory
   existing_metadata_ecs_task_role_name = var.existing_metadata_ecs_task_role_name
-  existing_lambda_execution_role_name = var.existing_lambda_execution_role_name
-  shared_iam_account_id = var.shared_iam_account_id
-  metaflow_vpc_id                  = var.vpc_id
-  rds_master_instance_endpoint     = module.metaflow-datastore.rds_master_instance_endpoint
-  s3_bucket_arn                    = module.metaflow-datastore.s3_bucket_arn
-  subnet1_id                       = var.subnet1_id
-  subnet2_id                       = var.subnet2_id
-  vpc_cidr_blocks                  = var.vpc_cidr_blocks
-  with_public_ip                   = var.with_public_ip
-  use_ecr_for_metadata_service     = var.use_ecr_for_metadata_service
-  ecr_repository_url               = var.use_ecr_for_metadata_service ? data.aws_ecr_repository.metaflow_metadata_service[0].repository_url : ""
+  existing_lambda_execution_role_name  = var.existing_lambda_execution_role_name
+  shared_iam_account_id                = var.shared_iam_account_id
+  metaflow_vpc_id                   = var.vpc_id
+  rds_master_instance_endpoint      = module.metaflow-datastore.rds_master_instance_endpoint
+  s3_bucket_arn                     = module.metaflow-datastore.s3_bucket_arn
+  subnet1_id                        = var.subnet1_id
+  subnet2_id                        = var.subnet2_id
+  vpc_cidr_blocks                   = var.vpc_cidr_blocks
+  with_public_ip                    = var.with_public_ip
+  use_ecr_for_metadata_service      = var.use_ecr_for_metadata_service
+  ecr_repository_url                = var.use_ecr_for_metadata_service ? data.aws_ecr_repository.metaflow_metadata_service[0].repository_url : ""
 
   standard_tags = var.tags
 }
@@ -98,6 +100,7 @@ module "metaflow-computation" {
   compute_environment_instance_types          = var.compute_environment_instance_types
   compute_environment_max_vcpus               = var.compute_environment_max_vcpus
   compute_environment_min_vcpus               = var.compute_environment_min_vcpus
+  compute_environment_allocation_strategy     = var.compute_environment_allocation_strategy
   compute_environment_egress_cidr_blocks      = var.compute_environment_egress_cidr_blocks
   iam_partition                               = var.iam_partition
   metaflow_vpc_id                             = var.vpc_id
@@ -107,11 +110,18 @@ module "metaflow-computation" {
   launch_template_http_tokens                 = var.launch_template_http_tokens
   launch_template_http_put_response_hop_limit = var.launch_template_http_put_response_hop_limit
 
-  existing_ecs_execution_role_name = var.existing_ecs_execution_role_name
-  existing_batch_execution_role_name = var.existing_batch_execution_role_name
-  existing_ecs_instance_role_name = var.existing_ecs_instance_role_name
-  existing_ecs_instance_profile_name = var.existing_ecs_instance_profile_name
-  shared_iam_account_id = var.shared_iam_account_id
+  # CPU compute environment
+  enable_cpu_compute_environment              = var.enable_cpu_compute_environment
+  cpu_compute_environment_instance_types      = var.cpu_compute_environment_instance_types
+  cpu_compute_environment_min_vcpus           = var.cpu_compute_environment_min_vcpus
+  cpu_compute_environment_desired_vcpus       = var.cpu_compute_environment_desired_vcpus
+  cpu_compute_environment_max_vcpus           = var.cpu_compute_environment_max_vcpus
+  cpu_compute_environment_allocation_strategy = var.cpu_compute_environment_allocation_strategy
+  existing_ecs_execution_role_name            = var.existing_ecs_execution_role_name
+  existing_batch_execution_role_name          = var.existing_batch_execution_role_name
+  existing_ecs_instance_role_name             = var.existing_ecs_instance_role_name
+  existing_ecs_instance_profile_name          = var.existing_ecs_instance_profile_name
+  shared_iam_account_id                       = var.shared_iam_account_id
 
   standard_tags = var.tags
 }
@@ -128,9 +138,14 @@ module "metaflow-step-functions" {
   s3_bucket_arn       = module.metaflow-datastore.s3_bucket_arn
   s3_bucket_kms_arn   = module.metaflow-datastore.datastore_s3_bucket_kms_key_arn
 
-  existing_eventbridge_role_name = var.existing_eventbridge_role_name
+  additional_batch_job_queue_arns = compact([
+    var.enable_cpu_compute_environment ? module.metaflow-computation.METAFLOW_BATCH_CPU_JOB_QUEUE : "",
+    module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE,
+    module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE,
+  ])
+  existing_eventbridge_role_name    = var.existing_eventbridge_role_name
   existing_step_functions_role_name = var.existing_step_functions_role_name
-  shared_iam_account_id = var.shared_iam_account_id
+  shared_iam_account_id             = var.shared_iam_account_id
 
   standard_tags = var.tags
 }

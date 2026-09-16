@@ -18,6 +18,23 @@ resource "aws_launch_template" "cpu" {
   # Null image_id allows AWS Batch to decide.
   image_id = var.launch_template_image_id
 
+  # User data to configure ECS agent to join the correct cluster
+  # AWS Batch requires MIME multipart format for user data
+  user_data = base64encode(<<-EOF
+Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+MIME-Version: 1.0
+
+--==MYBOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
+
+#!/bin/bash
+echo ECS_CLUSTER=${local.compute_env_prefix_name}* >> /etc/ecs/ecs.config
+echo ECS_BACKEND_HOST= >> /etc/ecs/ecs.config
+
+--==MYBOUNDARY==--
+EOF
+  )
+
   block_device_mappings {
     device_name = "/dev/xvda"
 
