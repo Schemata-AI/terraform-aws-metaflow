@@ -142,3 +142,33 @@ variable "cpu_compute_environment_allocation_strategy" {
   default     = "BEST_FIT_PROGRESSIVE"
   description = "Allocation strategy for CPU Batch Compute environment (BEST_FIT, BEST_FIT_PROGRESSIVE, SPOT_CAPACITY_OPTIMIZED)"
 }
+
+variable "existing_ecs_execution_role_name" {
+  type        = string
+  description = "Name of existing ECS execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "shared_iam_account_id" {
+  type        = string
+  description = "AWS account ID where IAM roles are hosted (separate from deployment account)"
+  default     = ""
+}
+
+variable "existing_batch_execution_role_name" {
+  type        = string
+  description = "Name of existing Batch execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_instance_role_name" {
+  type        = string
+  description = "Name of existing ECS instance role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_instance_profile_name" {
+  type        = string
+  description = "Name of existing ECS instance profile. If provided, instance profile will not be created."
+  default     = ""
+}

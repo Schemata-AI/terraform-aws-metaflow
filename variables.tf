@@ -28,6 +28,29 @@ variable "enable_custom_batch_container_registry" {
   description = "Provisions infrastructure for custom Amazon ECR container registry if enabled"
 }
 
+variable "use_ecr_for_metadata_service" {
+  type        = bool
+  default     = true
+  description = "Use ECR instead of Docker Hub for metadata service container image. This avoids internet connectivity issues."
+}
+
+variable "aws_profile" {
+  type        = string
+  default     = ""
+  description = "AWS profile to use for ECR operations. If empty, uses default profile."
+}
+
+variable "database_ssl_mode" {
+  type        = string
+  description = "The metadata service database connection ssl mode"
+  default     = ""  # Empty means use default logic
+  
+  validation {
+    condition     = var.database_ssl_mode == "" || contains(["disable", "allow", "prefer", "require", "verify-ca", "verify-full"], var.database_ssl_mode)
+    error_message = "The database_ssl_mode variable must be empty or one of: disable, allow, prefer, require, verify-ca, verify-full."
+  }
+}
+
 variable "enable_step_functions" {
   type        = bool
   description = "Provisions infrastructure for step functions if enabled"
@@ -171,6 +194,11 @@ variable "subnet2_id" {
   description = "Second subnet used for availability zone redundancy"
 }
 
+variable "public_subnet_ids" {
+  type        = list(string)
+  description = "List of public subnet IDs for fck-nat instances. fck-nat instances need public subnets to access the internet."
+}
+
 variable "vpc_cidr_blocks" {
   type        = list(string)
   description = "The VPC CIDR blocks that we'll access list on our Metadata Service API to allow all internal communications"
@@ -260,4 +288,88 @@ variable "cpu_compute_environment_allocation_strategy" {
   type        = string
   default     = "BEST_FIT_PROGRESSIVE"
   description = "Allocation strategy for CPU Batch Compute environment (BEST_FIT, BEST_FIT_PROGRESSIVE, SPOT_CAPACITY_OPTIMIZED)"
+}
+
+variable "existing_batch_s3_task_role_name" {
+  type        = string
+  description = "Name of existing IAM role for Batch S3 tasks. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_execution_role_name" {
+  type        = string
+  description = "Name of existing ECS execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "shared_iam_account_id" {
+  type        = string
+  description = "AWS account ID where IAM roles are hosted (separate from deployment account)"
+  default     = ""
+}
+
+variable "existing_batch_execution_role_name" {
+  type        = string
+  description = "Name of existing Batch execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_instance_role_name" {
+  type        = string
+  description = "Name of existing ECS instance role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_ecs_instance_profile_name" {
+  type        = string
+  description = "Name of existing ECS instance profile. If provided, instance profile will not be created."
+  default     = ""
+}
+
+variable "existing_metadata_ecs_task_role_name" {
+  type        = string
+  description = "Name of existing metadata service ECS task role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_lambda_execution_role_name" {
+  type        = string
+  description = "Name of existing Lambda execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_eventbridge_role_name" {
+  type        = string
+  description = "Name of existing EventBridge role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_step_functions_role_name" {
+  type        = string
+  description = "Name of existing Step Functions role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "metadata_service_cpu" {
+  type        = number
+  default     = 512
+  description = "ECS task CPU units for metadata service (Fargate: 256, 512, 1024, 2048, 4096)"
+}
+
+variable "metadata_service_memory" {
+  type        = number
+  default     = 1024
+  description = "ECS task memory in MiB for metadata service"
+}
+
+variable "enable_fck_nat" {
+  type        = bool
+  default     = false
+  description = "Enable fck-nat instances for cost-optimized outbound internet access instead of NAT Gateway"
+}
+
+variable "fck_nat_instance_type" {
+  type        = string
+  default     = "t3.nano"
+  description = "Instance type for fck-nat instances (t3.nano recommended for cost optimization)"
 }

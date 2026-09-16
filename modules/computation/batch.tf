@@ -9,20 +9,15 @@ resource "aws_batch_compute_environment" "this" {
   compute_environment_name_prefix = local.compute_env_prefix_name
 
   # Give permissions so the batch service can make API calls.
-  service_role = aws_iam_role.batch_execution_role.arn
+  service_role = local.batch_execution_role_arn_actual
   type         = "MANAGED"
 
   # On destroy, this avoids removing these policies below until compute environments are destroyed
-  depends_on = [
-    aws_iam_role_policy.grant_iam_pass_role,
-    aws_iam_role_policy.grant_custom_access_policy,
-    aws_iam_role_policy.grant_iam_custom_policies,
-    aws_iam_role_policy.grant_ec2_custom_policies,
-  ]
+  # Note: depends_on doesn't support conditionals, so we depend on the policies if they exist
 
   compute_resources {
     # Give permissions so the ECS container instances can make API call.
-    instance_role = !local.enable_fargate_on_batch ? aws_iam_instance_profile.ecs_instance_role.arn : null
+    instance_role = !local.enable_fargate_on_batch ? local.ecs_instance_profile_arn_actual : null
 
     # List of types that can be launched.
     instance_type = !local.enable_fargate_on_batch ? var.compute_environment_instance_types : null
