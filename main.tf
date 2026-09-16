@@ -39,6 +39,11 @@ module "metaflow-metadata-service" {
   fargate_execution_role_arn        = module.metaflow-computation.ecs_execution_role_arn
   iam_partition                     = var.iam_partition
   metadata_service_container_image  = local.metadata_service_container_image
+  metadata_service_cpu              = var.metadata_service_cpu
+  metadata_service_memory           = var.metadata_service_memory
+  existing_metadata_ecs_task_role_name = var.existing_metadata_ecs_task_role_name
+  existing_lambda_execution_role_name  = var.existing_lambda_execution_role_name
+  shared_iam_account_id                = var.shared_iam_account_id
   metaflow_vpc_id                   = var.vpc_id
   rds_master_instance_endpoint      = module.metaflow-datastore.rds_master_instance_endpoint
   s3_bucket_arn                     = module.metaflow-datastore.s3_bucket_arn
@@ -46,6 +51,8 @@ module "metaflow-metadata-service" {
   subnet2_id                        = var.subnet2_id
   vpc_cidr_blocks                   = var.vpc_cidr_blocks
   with_public_ip                    = var.with_public_ip
+  use_ecr_for_metadata_service      = var.use_ecr_for_metadata_service
+  ecr_repository_url                = var.use_ecr_for_metadata_service ? data.aws_ecr_repository.metaflow_metadata_service[0].repository_url : ""
 
   standard_tags = var.tags
 }
@@ -110,6 +117,11 @@ module "metaflow-computation" {
   cpu_compute_environment_desired_vcpus       = var.cpu_compute_environment_desired_vcpus
   cpu_compute_environment_max_vcpus           = var.cpu_compute_environment_max_vcpus
   cpu_compute_environment_allocation_strategy = var.cpu_compute_environment_allocation_strategy
+  existing_ecs_execution_role_name            = var.existing_ecs_execution_role_name
+  existing_batch_execution_role_name          = var.existing_batch_execution_role_name
+  existing_ecs_instance_role_name             = var.existing_ecs_instance_role_name
+  existing_ecs_instance_profile_name          = var.existing_ecs_instance_profile_name
+  shared_iam_account_id                       = var.shared_iam_account_id
 
   standard_tags = var.tags
 }
@@ -131,6 +143,9 @@ module "metaflow-step-functions" {
     module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_JOB_QUEUE,
     module.metaflow-computation.METAFLOW_BATCH_FAIRSHARE_CPU_JOB_QUEUE,
   ])
+  existing_eventbridge_role_name    = var.existing_eventbridge_role_name
+  existing_step_functions_role_name = var.existing_step_functions_role_name
+  shared_iam_account_id             = var.shared_iam_account_id
 
   standard_tags = var.tags
 }

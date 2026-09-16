@@ -13,13 +13,15 @@ locals {
   metadata_service_security_group_name = "${var.resource_prefix}metadata-service-security-group${var.resource_suffix}"
   metadata_service_container_image = (
     var.metadata_service_container_image == "" ?
-    module.metaflow-common.default_metadata_service_container_image :
+    (var.use_ecr_for_metadata_service ? 
+      "${var.ecr_repository_url}:v2.3.0" :
+      module.metaflow-common.default_metadata_service_container_image) :
     var.metadata_service_container_image
   )
 
   api_gateway_endpoint_configuration_type = local.is_gov ? "REGIONAL" : "EDGE"
   api_gateway_key_name                    = "${var.resource_prefix}key${var.resource_suffix}"
-  api_gateway_stage_name                  = "api"
+  api_gateway_stage_name                  = "metaflow"
   api_gateway_usage_plan_name             = "${var.resource_prefix}usage-plan${var.resource_suffix}"
 
   db_migrate_lambda_zip_file   = coalesce(var.db_migrate_lambda_zip_file, "${path.module}/db_migrate_lambda.zip")
@@ -27,4 +29,12 @@ locals {
   lambda_ecs_execute_role_name = "${var.resource_prefix}lambda_ecs_execute${var.resource_suffix}"
 
   cloudwatch_logs_arn_prefix = "arn:${var.iam_partition}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}"
+  
+  # Reference to the metadata ECS task role (use wrapper role when cross-account, otherwise local role)
+  metadata_ecs_task_role_name_actual = var.existing_metadata_ecs_task_role_name != "" ? aws_iam_role.metadata_svc_ecs_task_wrapper_role.name : aws_iam_role.metadata_svc_ecs_task_role[0].name
+  metadata_ecs_task_role_arn_actual = var.existing_metadata_ecs_task_role_name != "" ? aws_iam_role.metadata_svc_ecs_task_wrapper_role.arn : aws_iam_role.metadata_svc_ecs_task_role[0].arn
+  
+  # Reference to the lambda execution role (use wrapper role when cross-account, otherwise local role)
+  lambda_execution_role_name_actual = var.existing_lambda_execution_role_name != "" ? aws_iam_role.lambda_execution_wrapper_role[0].name : aws_iam_role.lambda_ecs_execute_role[0].name
+  lambda_execution_role_arn_actual = var.existing_lambda_execution_role_name != "" ? aws_iam_role.lambda_execution_wrapper_role[0].arn : aws_iam_role.lambda_ecs_execute_role[0].arn
 }

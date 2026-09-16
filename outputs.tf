@@ -39,7 +39,7 @@ output "METAFLOW_DATATOOLS_S3ROOT" {
 }
 
 output "METAFLOW_ECS_S3_ACCESS_IAM_ROLE" {
-  value       = aws_iam_role.batch_s3_task_role.arn
+  value       = local.batch_s3_task_role_arn_actual
   description = "Role for AWS Batch to Access Amazon S3"
 }
 
@@ -121,7 +121,7 @@ output "metaflow_profile_json" {
         "METAFLOW_DATASTORE_SYSROOT_S3"       = module.metaflow-datastore.METAFLOW_DATASTORE_SYSROOT_S3,
         "METAFLOW_DATATOOLS_S3ROOT"           = module.metaflow-datastore.METAFLOW_DATATOOLS_S3ROOT,
         "METAFLOW_BATCH_JOB_QUEUE"            = module.metaflow-computation.METAFLOW_BATCH_JOB_QUEUE,
-        "METAFLOW_ECS_S3_ACCESS_IAM_ROLE"     = aws_iam_role.batch_s3_task_role.arn
+        "METAFLOW_ECS_S3_ACCESS_IAM_ROLE"     = local.batch_s3_task_role_arn_actual
         "METAFLOW_SERVICE_URL"                = module.metaflow-metadata-service.METAFLOW_SERVICE_URL,
         "METAFLOW_SERVICE_INTERNAL_URL"       = module.metaflow-metadata-service.METAFLOW_SERVICE_INTERNAL_URL,
         "METAFLOW_SFN_IAM_ROLE"               = module.metaflow-step-functions.metaflow_step_functions_role_arn,
@@ -169,4 +169,11 @@ output "ui_alb_zone_id" {
 output "batch_compute_environment_security_group_id" {
   value       = module.metaflow-computation.batch_compute_environment_security_group_id
   description = "The ID of the security group attached to the Batch Compute environment."
+}
+
+# Temporary output for database setup - REMOVE AFTER USE
+output "database_password" {
+  value       = module.metaflow-datastore.database_password
+  description = "Database password for manual setup"
+  sensitive   = true
 }

@@ -15,23 +15,26 @@ data "aws_iam_policy_document" "ecs_instance_role_assume_role" {
   }
 }
 
-resource "aws_iam_role" "ecs_instance_role" {
-  name = local.ecs_instance_role_name
-  # Learn more by reading this Terraform documentation https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/batch_compute_environment#argument-reference
-  # Learn more by reading this AWS Batch documentation https://docs.aws.amazon.com/batch/latest/userguide/service_IAM_role.html
-  description = "This role is passed to AWS Batch as a `instance_role`. This allows our Metaflow Batch jobs to execute with proper permissions."
-
+resource "aws_iam_role" "ecs_instance_wrapper_role" {
+  name               = "${var.resource_prefix}ecs-instance-wrapper-role${var.resource_suffix}"
   assume_role_policy = data.aws_iam_policy_document.ecs_instance_role_assume_role.json
+  description        = "Wrapper role that assumes the shared ECS instance role"
+  
+  tags = var.standard_tags
 }
 
-/*
- Attach policy AmazonEC2ContainerServiceforEC2Role to ecs_instance_role. The
- policy is what the role is allowed to do similar to rwx for a user.
- AmazonEC2ContainerServiceforEC2Role is a predefined set of permissions by aws the
- permissions given are at:
- https://docs.aws.amazon.com/AmazonECS/latest/developerguide/instance_IAM_role.html
-*/
-resource "aws_iam_role_policy_attachment" "ecs_instance_role" {
-  role       = aws_iam_role.ecs_instance_role.name
-  policy_arn = "arn:${var.iam_partition}:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+resource "aws_iam_role_policy" "assume_shared_ecs_instance_role" {
+  name = "assume-shared-role"
+  role = aws_iam_role.ecs_instance_wrapper_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Resource = "arn:${var.iam_partition}:iam::${var.shared_iam_account_id}:role/${var.existing_ecs_instance_role_name}"
+      }
+    ]
+  })
 }

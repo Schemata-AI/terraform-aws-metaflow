@@ -144,3 +144,33 @@ variable "with_public_ip" {
   type        = bool
   description = "Enable public IP assignment for the Metadata Service. Typically you want this to be set to true if using public subnets as subnet1_id and subnet2_id, and false otherwise"
 }
+
+variable "use_ecr_for_metadata_service" {
+  type        = bool
+  default     = true
+  description = "Use ECR instead of Docker Hub for metadata service container image"
+}
+
+variable "ecr_repository_url" {
+  type        = string
+  default     = ""
+  description = "ECR repository URL for metadata service container image"
+}
+
+variable "existing_metadata_ecs_task_role_name" {
+  type        = string
+  description = "Name of existing metadata service ECS task role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "existing_lambda_execution_role_name" {
+  type        = string
+  description = "Name of existing Lambda execution role. If provided, role will not be created."
+  default     = ""
+}
+
+variable "shared_iam_account_id" {
+  type        = string
+  description = "AWS account ID where IAM roles are hosted (separate from deployment account)"
+  default     = ""
+}

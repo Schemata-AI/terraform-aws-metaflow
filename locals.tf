@@ -13,7 +13,9 @@ locals {
   metaflow_batch_image_name = "${local.resource_prefix}batch${local.resource_suffix}"
   metadata_service_container_image = (
     var.metadata_service_container_image == "" ?
-    module.metaflow-common.default_metadata_service_container_image :
+    (var.use_ecr_for_metadata_service ? 
+      "${data.aws_ecr_repository.metaflow_metadata_service[0].repository_url}:v2.3.0" :
+      module.metaflow-common.default_metadata_service_container_image) :
     var.metadata_service_container_image
   )
   ui_static_container_image = (
@@ -24,5 +26,10 @@ locals {
 
   # RDS PostgreSQL >= 15 requires SSL by default
   # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL.Concepts.General.SSL.html#PostgreSQL.Concepts.General.SSL.Requiring
-  database_ssl_mode = tonumber(split(".", var.db_engine_version)[0]) >= 15 ? "require" : "disable"
+  # Use user-provided SSL mode if specified, otherwise use default logic
+  database_ssl_mode = var.database_ssl_mode != "" ? var.database_ssl_mode : (tonumber(split(".", var.db_engine_version)[0]) >= 15 ? "require" : "disable")
+  
+  # Reference to the batch S3 task role (either existing or created)
+  batch_s3_task_role_name_actual = var.existing_batch_s3_task_role_name != "" ? var.existing_batch_s3_task_role_name : aws_iam_role.batch_s3_task_role[0].name
+  batch_s3_task_role_arn_actual = var.existing_batch_s3_task_role_name != "" ? "arn:${var.iam_partition}:iam::${var.shared_iam_account_id}:role/${var.existing_batch_s3_task_role_name}" : aws_iam_role.batch_s3_task_role[0].arn
 }
