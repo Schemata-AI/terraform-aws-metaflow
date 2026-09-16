@@ -91,7 +91,7 @@ resource "aws_batch_compute_environment" "cpu" {
   compute_environment_name_prefix = local.cpu_compute_env_prefix_name
 
   # Give permissions so the batch service can make API calls.
-  service_role = aws_iam_role.batch_execution_role.arn
+  service_role = local.batch_execution_role_arn_actual
   type         = "MANAGED"
 
   depends_on = [
@@ -102,7 +102,7 @@ resource "aws_batch_compute_environment" "cpu" {
   ]
 
   compute_resources {
-    instance_role = aws_iam_instance_profile.ecs_instance_role.arn
+    instance_role = local.ecs_instance_profile_arn_actual
 
     # CPU-only instance types
     instance_type = var.cpu_compute_environment_instance_types

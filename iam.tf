@@ -283,7 +283,8 @@ resource "aws_iam_role_policy" "grant_cloudwatch" {
 }
 
 resource "aws_iam_role_policy" "grant_secrets_manager" {
+  count  = var.existing_batch_s3_task_role_name == "" ? 1 : 0
   name   = "secrets_manager"
-  role   = aws_iam_role.batch_s3_task_role.name
+  role   = local.batch_s3_task_role_name_actual
   policy = data.aws_iam_policy_document.secrets_manager.json
 }
