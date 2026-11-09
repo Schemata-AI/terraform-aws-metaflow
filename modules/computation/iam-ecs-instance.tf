@@ -35,3 +35,10 @@ resource "aws_iam_role_policy_attachment" "ecs_instance_role" {
   role       = aws_iam_role.ecs_instance_role.name
   policy_arn = "arn:${var.iam_partition}:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
+
+# Session Manager on the Batch hosts. Jupyter stays on the instance; the laptop
+# port-forwards. The compute security group does not open 8888.
+resource "aws_iam_role_policy_attachment" "ecs_instance_role_ssm" {
+  role       = aws_iam_role.ecs_instance_role.name
+  policy_arn = "arn:${var.iam_partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
