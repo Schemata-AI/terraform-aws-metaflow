@@ -183,6 +183,11 @@ resource "aws_batch_scheduling_policy" "tessera" {
       share_identifier = "tesseraEval"
       weight_factor    = 1
     }
+
+    share_distribution {
+      share_identifier = "research"
+      weight_factor    = 1
+    }
   }
 
   tags = var.standard_tags
