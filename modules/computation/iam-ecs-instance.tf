@@ -43,6 +43,6 @@ resource "aws_iam_role_policy" "assume_shared_ecs_instance_role" {
 # the laptop port-forwards. Staging/production ECS instance roles stay without SSM.
 resource "aws_iam_role_policy_attachment" "ecs_instance_role_ssm" {
   count      = lookup(var.standard_tags, "env", "") == "development" ? 1 : 0
-  role       = aws_iam_role.ecs_instance_role.name
+  role       = aws_iam_role.ecs_instance_wrapper_role.name
   policy_arn = "arn:${var.iam_partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
