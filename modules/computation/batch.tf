@@ -70,8 +70,11 @@ resource "aws_batch_compute_environment" "this" {
        as no inplace modification can be made
     */
     create_before_destroy = true
-    # To ensure terraform redeploys do not silently overwrite an up to date desired_vcpus that metaflow may modify
-    ignore_changes = [compute_resources.0.desired_vcpus]
+    # The batch scaling Lambda owns these. Apply must not reset the daytime floor.
+    ignore_changes = [
+      compute_resources.0.desired_vcpus,
+      compute_resources.0.min_vcpus,
+    ]
   }
 }
 
@@ -143,7 +146,11 @@ resource "aws_batch_compute_environment" "cpu" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes        = [compute_resources.0.desired_vcpus]
+    # The batch scaling Lambda owns these. Apply must not reset the daytime floor.
+    ignore_changes = [
+      compute_resources.0.desired_vcpus,
+      compute_resources.0.min_vcpus,
+    ]
   }
 }
 
